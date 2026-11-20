@@ -1,0 +1,191 @@
+ <!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DROPZONE — Демо-открытие кейсов</title>
+  <script src="https://tailwindcss.com"></script>
+  <style>
+    @import url('https://googleapis.com');
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #0b0e17;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+    .neon-glow {
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.35);
+    }
+    .roulette-track {
+      will-change: transform;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px) scale(0.9); }
+      to { opacity: 1; transform: translateX(0) scale(1); }
+    }
+    .live-item {
+      animation: slideIn 0.35s ease-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Лайв-дроп лента -->
+  <div class="bg-[#080a11] border-b border-slate-800/80 py-2 px-3 overflow-hidden">
+    <div class="max-w-7xl mx-auto flex items-center gap-3">
+      <div class="flex items-center gap-1.5 shrink-0 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">Live</span>
+      </div>
+      <div id="liveDropContainer" class="flex items-center gap-2 overflow-x-auto no-scrollbar"></div>
+    </div>
+  </div>
+
+  <!-- Шапка сайта -->
+  <header class="bg-[#101524]/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-6">
+        <a href="#" onclick="switchTab('cases')" class="text-xl sm:text-2xl font-black tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+          DROP<span class="text-white">ZONE</span>
+        </a>
+        <nav class="flex items-center gap-1 sm:gap-2">
+          <button onclick="switchTab('cases')" id="nav-cases" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold bg-indigo-600 text-white transition">Кейсы</button>
+          <button onclick="switchTab('upgrade')" id="nav-upgrade" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition">Апгрейд</button>
+          <button onclick="switchTab('inventory')" id="nav-inventory" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center gap-1.5">
+            Инвентарь
+            <span id="invCountBadge" class="bg-slate-700 text-white text-[10px] px-1.5 py-0.5 rounded-full">0</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Баланс -->
+      <div class="flex items-center gap-2 bg-[#161d31] border border-slate-700/70 pl-3 pr-1.5 py-1 rounded-xl">
+        <div class="text-xs sm:text-sm font-extrabold text-emerald-400">
+          <span id="balanceDisplay">10 000</span> ₽
+        </div>
+        <button onclick="addDemoBalance()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs px-2.5 py-1.5 rounded-lg transition active:scale-95">
+          + 5 000
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Основной контент -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
+
+    <!-- ВКЛАДКА: КЕЙСЫ -->
+    <section id="tab-cases">
+      <div class="mb-6 text-center sm:text-left">
+        <h1 class="text-2xl sm:text-3xl font-black uppercase tracking-wide">Популярные кейсы</h1>
+        <p class="text-slate-400 text-xs sm:text-sm mt-1">Демо-режим: испытай удачу без вложений</p>
+      </div>
+
+      <div id="casesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+    </section>
+
+    <!-- ВКЛАДКА: АПГРЕЙД -->
+    <section id="tab-upgrade" class="hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-black uppercase">Апгрейд скинов</h2>
+        <p class="text-slate-400 text-xs sm:text-sm mt-1">Выберите свой скин слева и желаемый скин справа</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center bg-[#111727] border border-slate-800 rounded-2xl p-5">
+        <div class="bg-[#0b0e17] border border-slate-800 rounded-xl p-4">
+          <h3 class="text-xs font-bold uppercase text-slate-400 mb-3">1. Ваш предмет из инвентаря</h3>
+          <div id="upgradeSourceList" class="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-1"></div>
+        </div>
+
+        <div class="flex flex-col items-center justify-center text-center py-4">
+          <div class="relative w-44 h-44 rounded-full border-8 border-slate-800 flex flex-col items-center justify-center bg-[#0b0e17] shadow-inner">
+            <span class="text-xs text-slate-400 font-bold uppercase">Шанс</span>
+            <span id="upgradeChanceText" class="text-3xl font-black text-indigo-400">0%</span>
+            <span id="upgradeMultiplierText" class="text-[11px] text-slate-500 mt-1">x0.00</span>
+          </div>
+          <p id="upgradeStatusMsg" class="text-xs font-bold text-slate-300 mt-4 h-5"></p>
+          <button id="btnRunUpgrade" onclick="runUpgrade()" disabled class="mt-3 w-full max-w-xs bg-indigo-600 disabled:bg-slate-800 disabled:text-slate-500 hover:bg-indigo-500 text-white font-extrabold py-3 px-6 rounded-xl transition uppercase text-sm tracking-wider">
+            Прокачать скин
+          </button>
+        </div>
+
+        <div class="bg-[#0b0e17] border border-slate-800 rounded-xl p-4">
+          <h3 class="text-xs font-bold uppercase text-slate-400 mb-3">2. Желаемый предмет</h3>
+          <div id="upgradeTargetList" class="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-1"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ВКЛАДКА: ИНВЕНТАРЬ -->
+    <section id="tab-inventory" class="hidden">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div>
+          <h2 class="text-2xl font-black uppercase">Ваш инвентарь</h2>
+          <p class="text-slate-400 text-xs sm:text-sm mt-1">Все выбитые предметы хранятся здесь</p>
+        </div>
+        <button onclick="sellAllInventory()" class="bg-rose-600/20 hover:bg-rose-600/30 border border-rose-500/40 text-rose-300 text-xs font-bold px-4 py-2 rounded-xl transition">
+          Продать всё
+        </button>
+      </div>
+      <div id="inventoryGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+    </section>
+
+  </main>
+
+  <!-- МОДАЛЬНОЕ ОКНО: РУЛЕТКА ОТКРЫТИЯ КЕЙСА -->
+  <div id="caseModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-40 hidden flex items-center justify-center p-4">
+    <div class="bg-[#111727] border border-slate-700/80 rounded-2xl max-w-3xl w-full p-5 sm:p-6 relative shadow-2xl">
+      <button onclick="closeCaseModal()" id="closeModalBtn" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl font-bold px-2">✕</button>
+
+      <div class="text-center mb-5">
+        <h3 id="modalCaseTitle" class="text-xl sm:text-2xl font-black uppercase">Название кейса</h3>
+        <p class="text-xs text-slate-400 mt-1">Цена открытия: <span id="modalCasePrice" class="text-emerald-400 font-bold">0 ₽</span></p>
+      </div>
+
+      <!-- Окно рулетки -->
+      <div class="relative bg-[#080b12] border-2 border-slate-800 rounded-xl h-40 overflow-hidden mb-5">
+        <div class="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-1 bg-amber-400 z-20 shadow-[0_0_12px_#fbbf24]"></div>
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-amber-400 z-20"></div>
+        <div id="rouletteTrack" class="roulette-track flex items-center h-full gap-2 px-2"></div>
+      </div>
+
+      <!-- Кнопка крутить -->
+      <div id="spinControls" class="flex justify-center">
+        <button id="spinBtn" onclick="startSpin()" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black uppercase tracking-wider py-3.5 px-10 rounded-xl neon-glow transition active:scale-95 text-sm sm:text-base">
+          Открыть кейс
+        </button>
+      </div>
+
+      <!-- Результат выигрыша -->
+      <div id="winResultBox" class="hidden text-center bg-[#0b0e17] border border-slate-700 rounded-xl p-4 mt-2">
+        <p class="text-xs uppercase text-slate-400 font-bold">Вам выпал предмет!</p>
+        <div id="winItemCard" class="my-3 flex flex-col items-center"></div>
+        <div class="flex flex-wrap justify-center gap-3 mt-3">
+          <button onclick="keepWonItem()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl transition">
+            Забрать в инвентарь
+          </button>
+          <button onclick="sellWonItem()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl transition">
+            Продать за <span id="winSellPrice">0</span> ₽
+          </button>
+        </div>
+      </div>
+
+      <!-- Содержимое кейса -->
+      <div class="mt-6 pt-4 border-t border-slate-800/80">
+        <p class="text-xs font-bold uppercase text-slate-400 mb-3">Содержимое кейса:</p>
+        <div id="modalCaseContents" class="grid grid-cols-3 sm:grid-cols-6 gap-2"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const RARITY = {
+      blue:   { label: 'Армейское',     border: 'border-blue-500',   bg: 'from-blue-900/40 to-slate-900',   text: 'text-blue-400' },
+      purple: { label: 'Запрещенное',   border: 'border-purple-500', bg: 'from-purple-900/40 to-slate-900', text: 'text-purple-400' },
+     
