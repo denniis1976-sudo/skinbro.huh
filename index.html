@@ -1,191 +1,411 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DROPZONE — Демо-открытие кейсов</title>
-  <script src="https://tailwindcss.com"></script>
+  <title>SKINBRO DEMO — Открытие кейсов CS2</title>
   <style>
-    @import url('https://googleapis.com');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Montserrat', sans-serif;
-      background-color: #0b0e17;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      background-color: #111318;
       color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
       overflow-x: hidden;
     }
-    .neon-glow {
-      box-shadow: 0 0 20px rgba(99, 102, 241, 0.35);
+    .hidden { display: none !important; }
+
+    /* Лайв-лента дропов */
+    .live-strip {
+      background: #0b0c10;
+      border-bottom: 1px solid #1f232e;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-    .roulette-track {
-      will-change: transform;
+    .live-pill {
+      background: rgba(250, 204, 21, 0.12);
+      border: 1px solid rgba(250, 204, 21, 0.4);
+      color: #facc15;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 5px 10px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      text-transform: uppercase;
     }
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
+    .live-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: #facc15;
+      animation: blink 1.2s infinite;
     }
-    .no-scrollbar {
-      -ms-overflow-style: none;
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+    .live-list {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
       scrollbar-width: none;
     }
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(-20px) scale(0.9); }
-      to { opacity: 1; transform: translateX(0) scale(1); }
-    }
+    .live-list::-webkit-scrollbar { display: none; }
     .live-item {
-      animation: slideIn 0.35s ease-out;
+      flex-shrink: 0;
+      background: #171a23;
+      border-radius: 8px;
+      padding: 5px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 2px solid #3b82f6;
+      font-size: 11px;
     }
-  </style>
-</head>
-<body class="min-h-screen flex flex-col">
 
-  <!-- Лайв-дроп лента -->
-  <div class="bg-[#080a11] border-b border-slate-800/80 py-2 px-3 overflow-hidden">
-    <div class="max-w-7xl mx-auto flex items-center gap-3">
-      <div class="flex items-center gap-1.5 shrink-0 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">Live</span>
-      </div>
-      <div id="liveDropContainer" class="flex items-center gap-2 overflow-x-auto no-scrollbar"></div>
-    </div>
-  </div>
+    /* Шапка сайта */
+    header {
+      background: #161922;
+      border-bottom: 1px solid #232836;
+      padding: 12px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+    .header-wrap {
+      max-width: 1140px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .brand {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .brand span {
+      background: #facc15;
+      color: #111318;
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-size: 18px;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 6px;
+    }
+    .tab-btn {
+      background: #1e222e;
+      border: 1px solid #2b3040;
+      color: #9ca3af;
+      font-weight: 800;
+      font-size: 12px;
+      text-transform: uppercase;
+      padding: 8px 13px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      background: #facc15;
+      border-color: #facc15;
+      color: #111318;
+    }
+    .inv-badge {
+      background: rgba(0,0,0,0.25);
+      padding: 1px 6px;
+      border-radius: 6px;
+      margin-left: 4px;
+    }
+    .wallet {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #1e222e;
+      border: 1px solid #2e3446;
+      padding: 5px 6px 5px 12px;
+      border-radius: 10px;
+    }
+    .wallet-sum {
+      font-weight: 900;
+      font-size: 14px;
+      color: #facc15;
+    }
+    .wallet-add {
+      background: #22c55e;
+      color: #052e16;
+      border: none;
+      font-weight: 900;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 7px;
+      cursor: pointer;
+    }
 
-  <!-- Шапка сайта -->
-  <header class="bg-[#101524]/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-30">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-6">
-        <a href="#" onclick="switchTab('cases')" class="text-xl sm:text-2xl font-black tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-          DROP<span class="text-white">ZONE</span>
-        </a>
-        <nav class="flex items-center gap-1 sm:gap-2">
-          <button onclick="switchTab('cases')" id="nav-cases" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold bg-indigo-600 text-white transition">Кейсы</button>
-          <button onclick="switchTab('upgrade')" id="nav-upgrade" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition">Апгрейд</button>
-          <button onclick="switchTab('inventory')" id="nav-inventory" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center gap-1.5">
-            Инвентарь
-            <span id="invCountBadge" class="bg-slate-700 text-white text-[10px] px-1.5 py-0.5 rounded-full">0</span>
-          </button>
-        </nav>
-      </div>
+    /* Основной контейнер */
+    main {
+      max-width: 1140px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 16px;
+      flex: 1;
+    }
+    .sec-title {
+      font-size: 22px;
+      font-weight: 900;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sec-title::before {
+      content: '';
+      width: 5px;
+      height: 22px;
+      background: #facc15;
+      border-radius: 3px;
+    }
+    .sec-sub {
+      color: #9ca3af;
+      font-size: 13px;
+      margin: 6px 0 20px;
+    }
 
-      <!-- Баланс -->
-      <div class="flex items-center gap-2 bg-[#161d31] border border-slate-700/70 pl-3 pr-1.5 py-1 rounded-xl">
-        <div class="text-xs sm:text-sm font-extrabold text-emerald-400">
-          <span id="balanceDisplay">10 000</span> ₽
-        </div>
-        <button onclick="addDemoBalance()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs px-2.5 py-1.5 rounded-lg transition active:scale-95">
-          + 5 000
-        </button>
-      </div>
-    </div>
-  </header>
+    /* Сетка кейсов */
+    .cases-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .case-box {
+      background: linear-gradient(180deg, #1b1f2b 0%, #141720 100%);
+      border: 1px solid #272c3d;
+      border-radius: 14px;
+      padding: 20px 14px;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .case-box:hover {
+      transform: translateY(-4px);
+      border-color: #facc15;
+    }
+    .case-label {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: #facc15;
+      color: #111318;
+      font-size: 10px;
+      font-weight: 900;
+      padding: 3px 8px;
+      border-radius: 5px;
+    }
+    .case-emoji {
+      font-size: 62px;
+      margin: 14px 0;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.5));
+    }
+    .case-name {
+      font-size: 16px;
+      font-weight: 900;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .case-btn {
+      display: inline-block;
+      background: #252a3a;
+      color: #facc15;
+      border: 1px solid #363d54;
+      font-weight: 900;
+      font-size: 14px;
+      padding: 8px 20px;
+      border-radius: 8px;
+    }
+    .case-box:hover .case-btn {
+      background: #facc15;
+      color: #111318;
+      border-color: #facc15;
+    }
 
-  <!-- Основной контент -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
+    /* Цвета редкости CS2 */
+    .rar-blue   { border-bottom: 3px solid #3b82f6 !important; background: linear-gradient(180deg, rgba(59,130,246,0.2), #161922) !important; }
+    .rar-purple { border-bottom: 3px solid #a855f7 !important; background: linear-gradient(180deg, rgba(168,85,247,0.2), #161922) !important; }
+    .rar-pink   { border-bottom: 3px solid #ec4899 !important; background: linear-gradient(180deg, rgba(236,72,153,0.22), #161922) !important; }
+    .rar-red    { border-bottom: 3px solid #ef4444 !important; background: linear-gradient(180deg, rgba(239,68,68,0.25), #161922) !important; }
+    .rar-gold   { border-bottom: 3px solid #facc15 !important; background: linear-gradient(180deg, rgba(250,204,21,0.28), #161922) !important; }
 
-    <!-- ВКЛАДКА: КЕЙСЫ -->
-    <section id="tab-cases">
-      <div class="mb-6 text-center sm:text-left">
-        <h1 class="text-2xl sm:text-3xl font-black uppercase tracking-wide">Популярные кейсы</h1>
-        <p class="text-slate-400 text-xs sm:text-sm mt-1">Демо-режим: испытай удачу без вложений</p>
-      </div>
+    /* Модалка рулетки */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 9, 13, 0.9);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .modal-card {
+      background: #161922;
+      border: 1px solid #2c3244;
+      border-radius: 16px;
+      max-width: 740px;
+      width: 100%;
+      padding: 20px;
+      position: relative;
+      max-height: 92vh;
+      overflow-y: auto;
+    }
+    .modal-close {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      background: #232836;
+      border: none;
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .roulette-box {
+      position: relative;
+      background: #0d0f14;
+      border: 2px solid #262b3b;
+      border-radius: 12px;
+      height: 144px;
+      overflow: hidden;
+      margin: 16px 0;
+    }
+    .roulette-pointer {
+      position: absolute;
+      top: 0; bottom: 0; left: 50%;
+      width: 3px;
+      background: #facc15;
+      transform: translateX(-50%);
+      z-index: 10;
+      box-shadow: 0 0 12px #facc15;
+    }
+    .roulette-line {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      gap: 8px;
+      padding: 0 8px;
+      will-change: transform;
+    }
+    .skin-tile {
+      flex-shrink: 0;
+      width: 120px;
+      height: 124px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      text-align: center;
+    }
+    .btn-yellow {
+      background: #facc15;
+      color: #111318;
+      border: none;
+      font-weight: 900;
+      font-size: 14px;
+      text-transform: uppercase;
+      padding: 13px 28px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .btn-yellow:disabled {
+      background: #262b3b;
+      color: #6b7280;
+      cursor: not-allowed;
+    }
+    .btn-sell {
+      background: #22c55e;
+      color: #052e16;
+      border: none;
+      font-weight: 900;
+      font-size: 13px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .drop-banner {
+      background: #101219;
+      border: 1px solid #2e3446;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .loot-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .loot-item {
+      border-radius: 8px;
+      padding: 8px;
+      text-align: center;
+      font-size: 11px;
+    }
 
-      <div id="casesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
-    </section>
-
-    <!-- ВКЛАДКА: АПГРЕЙД -->
-    <section id="tab-upgrade" class="hidden">
-      <div class="mb-6">
-        <h2 class="text-2xl font-black uppercase">Апгрейд скинов</h2>
-        <p class="text-slate-400 text-xs sm:text-sm mt-1">Выберите свой скин слева и желаемый скин справа</p>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center bg-[#111727] border border-slate-800 rounded-2xl p-5">
-        <div class="bg-[#0b0e17] border border-slate-800 rounded-xl p-4">
-          <h3 class="text-xs font-bold uppercase text-slate-400 mb-3">1. Ваш предмет из инвентаря</h3>
-          <div id="upgradeSourceList" class="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-1"></div>
-        </div>
-
-        <div class="flex flex-col items-center justify-center text-center py-4">
-          <div class="relative w-44 h-44 rounded-full border-8 border-slate-800 flex flex-col items-center justify-center bg-[#0b0e17] shadow-inner">
-            <span class="text-xs text-slate-400 font-bold uppercase">Шанс</span>
-            <span id="upgradeChanceText" class="text-3xl font-black text-indigo-400">0%</span>
-            <span id="upgradeMultiplierText" class="text-[11px] text-slate-500 mt-1">x0.00</span>
-          </div>
-          <p id="upgradeStatusMsg" class="text-xs font-bold text-slate-300 mt-4 h-5"></p>
-          <button id="btnRunUpgrade" onclick="runUpgrade()" disabled class="mt-3 w-full max-w-xs bg-indigo-600 disabled:bg-slate-800 disabled:text-slate-500 hover:bg-indigo-500 text-white font-extrabold py-3 px-6 rounded-xl transition uppercase text-sm tracking-wider">
-            Прокачать скин
-          </button>
-        </div>
-
-        <div class="bg-[#0b0e17] border border-slate-800 rounded-xl p-4">
-          <h3 class="text-xs font-bold uppercase text-slate-400 mb-3">2. Желаемый предмет</h3>
-          <div id="upgradeTargetList" class="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-1"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ВКЛАДКА: ИНВЕНТАРЬ -->
-    <section id="tab-inventory" class="hidden">
-      <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <div>
-          <h2 class="text-2xl font-black uppercase">Ваш инвентарь</h2>
-          <p class="text-slate-400 text-xs sm:text-sm mt-1">Все выбитые предметы хранятся здесь</p>
-        </div>
-        <button onclick="sellAllInventory()" class="bg-rose-600/20 hover:bg-rose-600/30 border border-rose-500/40 text-rose-300 text-xs font-bold px-4 py-2 rounded-xl transition">
-          Продать всё
-        </button>
-      </div>
-      <div id="inventoryGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
-    </section>
-
-  </main>
-
-  <!-- МОДАЛЬНОЕ ОКНО: РУЛЕТКА ОТКРЫТИЯ КЕЙСА -->
-  <div id="caseModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-40 hidden flex items-center justify-center p-4">
-    <div class="bg-[#111727] border border-slate-700/80 rounded-2xl max-w-3xl w-full p-5 sm:p-6 relative shadow-2xl">
-      <button onclick="closeCaseModal()" id="closeModalBtn" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl font-bold px-2">✕</button>
-
-      <div class="text-center mb-5">
-        <h3 id="modalCaseTitle" class="text-xl sm:text-2xl font-black uppercase">Название кейса</h3>
-        <p class="text-xs text-slate-400 mt-1">Цена открытия: <span id="modalCasePrice" class="text-emerald-400 font-bold">0 ₽</span></p>
-      </div>
-
-      <!-- Окно рулетки -->
-      <div class="relative bg-[#080b12] border-2 border-slate-800 rounded-xl h-40 overflow-hidden mb-5">
-        <div class="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-1 bg-amber-400 z-20 shadow-[0_0_12px_#fbbf24]"></div>
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-amber-400 z-20"></div>
-        <div id="rouletteTrack" class="roulette-track flex items-center h-full gap-2 px-2"></div>
-      </div>
-
-      <!-- Кнопка крутить -->
-      <div id="spinControls" class="flex justify-center">
-        <button id="spinBtn" onclick="startSpin()" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black uppercase tracking-wider py-3.5 px-10 rounded-xl neon-glow transition active:scale-95 text-sm sm:text-base">
-          Открыть кейс
-        </button>
-      </div>
-
-      <!-- Результат выигрыша -->
-      <div id="winResultBox" class="hidden text-center bg-[#0b0e17] border border-slate-700 rounded-xl p-4 mt-2">
-        <p class="text-xs uppercase text-slate-400 font-bold">Вам выпал предмет!</p>
-        <div id="winItemCard" class="my-3 flex flex-col items-center"></div>
-        <div class="flex flex-wrap justify-center gap-3 mt-3">
-          <button onclick="keepWonItem()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl transition">
-            Забрать в инвентарь
-          </button>
-          <button onclick="sellWonItem()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl transition">
-            Продать за <span id="winSellPrice">0</span> ₽
-          </button>
-        </div>
-      </div>
-
-      <!-- Содержимое кейса -->
-      <div class="mt-6 pt-4 border-t border-slate-800/80">
-        <p class="text-xs font-bold uppercase text-slate-400 mb-3">Содержимое кейса:</p>
-        <div id="modalCaseContents" class="grid grid-cols-3 sm:grid-cols-6 gap-2"></div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const RARITY = {
-      blue:   { label: 'Армейское',     border: 'border-blue-500',   bg: 'from-blue-900/40 to-slate-900',   text: 'text-blue-400' },
-      purple: { label: 'Запрещенное',   border: 'border-purple-500', bg: 'from-purple-900/40 to-slate-900', text: 'text-purple-400' },
-     
+    /* Инвентарь и Апгрейд */
+    .inv-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+      gap: 12px;
+    }
+    .upg-panel {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      background: #161922;
+      border: 1px solid #262b3b;
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .upg-box {
+      background: #0f1117;
+      border: 1px solid #232836;
+      border-radius: 10px;
+      padding: 12px;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+    .upg-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .upg-card {
+      background: #171b26;
+      border: 1px solid #282e3f;
+      border-radius: 8px;
+      padding: 8px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .upg-card.active {
+      border-color: #facc15;
+      background: rgba(250, 204, 21, 0.14);
+    }
+    .wheel {
+      width: 150px;
+      height: 150px;
